@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "978896290348",
+    "firebase_url": "https://restraint-obssession.firebaseio.com",
+    "project_id": "restraint-obssession",
+    "storage_bucket": "restraint-obssession.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978896290348:android:1db66751629cf6920a4789",
+        "android_client_info": {
+          "package_name": "com.raghav.restraintobsession"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "978896290348-41ercbgi7oq48adogi52jlug38mcl1ib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDotY6JZP_TTntET-oPAgj24feur_fuNrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "978896290348-41ercbgi7oq48adogi52jlug38mcl1ib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
