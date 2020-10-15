@@ -2,140 +2,120 @@ package com.raghav.restraintobsession.register;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.hbb20.CountryCodePicker;
 import com.raghav.restraintobsession.R;
+import com.raghav.restraintobsession.login.Login;
+import com.raghav.restraintobsession.utilities.Constants;
+import com.raghav.restraintobsession.utilities.PreferenceManager;
 import com.raghav.restraintobsession.visitor_view.Dashboard;
 
 import java.util.HashMap;
-import java.util.Map;
+
 
 public class Register extends AppCompatActivity {
-    public static final String TAG = "TAG";
-    EditText mName,mEmail,mPassword,mconfirmpassword,mPhone;
-    Button mRegisterBtn;
-    FirebaseAuth fAuth;
-    FirebaseFirestore fStore;
-    String userID;
+    private static final String TAG = "Number";
+    private EditText inputFirstName, inputLastName, inputEmail, inputMobileNumber, inputPassword, inputConfirmPassword;
+    private Button buttonSignUp;
+    private CountryCodePicker cpp;
+    private ProgressBar progressSignUp;
+    private PreferenceManager preferenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mName   = findViewById(R.id.Name);
-        mEmail      = findViewById(R.id.Email);
-        mPassword   = findViewById(R.id.password2);
-        mconfirmpassword = findViewById(R.id.confirmpassword);
-        mPhone      = findViewById(R.id.phone);
-        mRegisterBtn= findViewById(R.id.registerBtn);
+        preferenceManager = new PreferenceManager(getApplicationContext());
 
-        fAuth = FirebaseAuth.getInstance();
-        fStore = FirebaseFirestore.getInstance();
-
-        if(fAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(),Dashboard.class));
-            finish();
-        }
+        inputFirstName = findViewById(R.id.FirstName);
+        inputLastName = findViewById(R.id.Lastname);
+        inputEmail = findViewById(R.id.Email);
+        inputMobileNumber = findViewById(R.id.Mobilenumber);
+        inputPassword = findViewById(R.id.Password);
+        inputConfirmPassword = findViewById(R.id.Confirmpassword);
+        cpp = findViewById(R.id.ccp);
+        buttonSignUp = findViewById(R.id.signupBtn);
+        progressSignUp = findViewById(R.id.signupprogress);
 
 
-        mRegisterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String email = mEmail.getText().toString().trim();
-                String password = mPassword.getText().toString().trim();
-                String confirmpassword = mconfirmpassword.getText().toString().trim();
-                final String Name = mName.getText().toString();
-                final String phone    = mPhone.getText().toString();
+        buttonSignUp.setOnClickListener(view -> {
+            if(inputFirstName.getText().toString().trim().isEmpty()){
+                Toast.makeText(Register.this, "Enter first name", Toast.LENGTH_SHORT).show();
+            }else if (inputLastName.getText().toString().trim().isEmpty()){
+                Toast.makeText(Register.this, "Enter last name", Toast.LENGTH_SHORT).show();
+            }else if(inputEmail.getText().toString().trim().isEmpty()){
+                Toast.makeText(Register.this, "Enter email", Toast.LENGTH_SHORT).show();
+            }else if(!Patterns.EMAIL_ADDRESS.matcher(inputEmail.getText().toString()).matches()){
+                Toast.makeText(Register.this, "Enter valid email", Toast.LENGTH_SHORT).show();
+            }else if (inputMobileNumber.getText().toString().trim().isEmpty()){
+                Toast.makeText(Register.this, "Enter mobile number", Toast.LENGTH_SHORT).show();
+            }else if (!Patterns.PHONE.matcher(inputMobileNumber.getText().toString()).matches()){
+                Toast.makeText(Register.this, "Enter valid mobile number", Toast.LENGTH_SHORT).show();
 
-                if(TextUtils.isEmpty(email)){
-                    mEmail.setError("Email is Required.");
-                    return;
-                }
-
-                if(TextUtils.isEmpty(password)){
-                    mPassword.setError("Password is Required.");
-                    return;
-                }
-                if(TextUtils.isEmpty(confirmpassword)){
-                    mconfirmpassword.setError("Password is Required.");
-                    return;
-                }
-
-
-                if(password.length() < 6){
-                    mPassword.setError("Password Must be >= 6 Characters");
-                    return;
-                }
-
-                // register the user in firebase
-
-                fAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-
-                            // send verification link
-
-                            FirebaseUser fuser = fAuth.getCurrentUser();
-                            fuser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(Register.this, "Verification Email Has been Sent.", Toast.LENGTH_SHORT).show();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: Email not sent " + e.getMessage());
-                                }
-                            });
-
-                            Toast.makeText(Register.this, "User Created.", Toast.LENGTH_SHORT).show();
-                            userID = fAuth.getCurrentUser().getUid();
-                            DocumentReference documentReference;
-                            documentReference = fStore.collection("users").document(userID);
-                            Map<String,Object> user = new HashMap<>();
-                            user.put("Name",Name);
-                            user.put("email",email);
-                            user.put("phone",phone);
-                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: user Profile is created for "+ userID);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: " + e.toString());
-                                }
-                            });
-                            startActivity(new Intent(getApplicationContext(), Dashboard.class));
-
-                        }else {
-                            Toast.makeText(Register.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+            }else if (inputPassword.getText().toString().trim().isEmpty()){
+                Toast.makeText(Register.this, "Enter password", Toast.LENGTH_SHORT).show();
+            }else if (inputConfirmPassword.getText().toString().trim().isEmpty()) {
+                Toast.makeText(Register.this, "Confirm your password", Toast.LENGTH_SHORT).show();
+            }else if (!inputPassword.getText().toString().equals(inputConfirmPassword.getText().toString())){
+                Toast.makeText(Register.this, "Password & confirm password must be same", Toast.LENGTH_SHORT).show();
+            }else {
+                SignUp();
             }
         });
 
 
+
+    }
+
+    private void SignUp() {
+        buttonSignUp.setVisibility(View.INVISIBLE);
+        progressSignUp.setVisibility(View.VISIBLE);
+
+
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        HashMap<String, Object> user = new HashMap<>();
+        user.put(Constants.KEY_FIRST_NAME,inputFirstName.getText().toString());
+        user.put(Constants.KEY_LAST_NAME,inputLastName.getText().toString());
+        user.put(Constants.KEY_EMAIL,inputEmail.getText().toString());
+        user.put(Constants.KEY_MOBILE,inputMobileNumber.getText().toString());
+        user.put(Constants.KEY_PASSWORD,inputPassword.getText().toString());
+
+        database.collection(Constants.KEY_COLLECTION_USERS)
+                .add(user)
+                .addOnSuccessListener(documentReference -> {
+                    preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                    preferenceManager.putString(Constants.KEY_USER_ID, documentReference.getId());
+                    preferenceManager.putString(Constants.KEY_FIRST_NAME, inputFirstName.getText().toString());
+                    preferenceManager.putString(Constants.KEY_LAST_NAME,inputLastName.getText().toString());
+                    preferenceManager.putString(Constants.KEY_EMAIL,inputEmail.getText().toString());
+                    preferenceManager.putString(Constants.KEY_MOBILE,inputMobileNumber.getText().toString());
+                    Intent intent = new Intent(getApplicationContext(), Dashboard.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity (intent);
+                })
+                .addOnFailureListener(e -> {
+                    progressSignUp.setVisibility(View.INVISIBLE);
+                    buttonSignUp.setVisibility(View.VISIBLE);
+                    Toast.makeText(Register.this, "Error" + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                });
+
+
+
+    }
+
+    public void SignIn(View view) {
+        Intent intent = new Intent(this, Login.class);
+        startActivity(intent);
     }
 }
