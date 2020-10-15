@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -121,7 +122,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void signOut(){
-        Toast.makeText(getContext(), "Signing Out", Toast.LENGTH_SHORT).show();
+
+
+
+
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         DocumentReference documentReference =
                 database.collection(Constants.KEY_COLLECTION_USERS).document(
@@ -133,7 +137,9 @@ public class HomeFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        Toast.makeText(getContext(), "Signing Out", Toast.LENGTH_SHORT).show();
                         preferenceManager.clearPreferences();
+                        FirebaseAuth.getInstance().signOut();
                         Intent intent = new Intent(getContext(), Login.class);
                         startActivity(intent);
                     }

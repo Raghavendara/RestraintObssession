@@ -9,7 +9,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 import com.raghav.restraintobsession.R;
@@ -19,6 +30,7 @@ import com.raghav.restraintobsession.utilities.PreferenceManager;
 import com.raghav.restraintobsession.visitor_view.Dashboard;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class Register extends AppCompatActivity {
@@ -28,6 +40,7 @@ public class Register extends AppCompatActivity {
     private CountryCodePicker cpp;
     private ProgressBar progressSignUp;
     private PreferenceManager preferenceManager;
+    private FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +48,7 @@ public class Register extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         preferenceManager = new PreferenceManager(getApplicationContext());
+        fAuth = FirebaseAuth.getInstance();
 
         inputFirstName = findViewById(R.id.FirstName);
         inputLastName = findViewById(R.id.Lastname);
@@ -82,33 +96,49 @@ public class Register extends AppCompatActivity {
 
 
 
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        HashMap<String, Object> user = new HashMap<>();
-        user.put(Constants.KEY_FIRST_NAME,inputFirstName.getText().toString());
-        user.put(Constants.KEY_LAST_NAME,inputLastName.getText().toString());
-        user.put(Constants.KEY_EMAIL,inputEmail.getText().toString());
-        user.put(Constants.KEY_MOBILE,inputMobileNumber.getText().toString());
-        user.put(Constants.KEY_PASSWORD,inputPassword.getText().toString());
+        fAuth.createUserWithEmailAndPassword(inputEmail.getText().toString().trim(), inputPassword.getText().toString().trim()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                FirebaseFirestore database = FirebaseFirestore.getInstance();
+                HashMap<String, Object> user = new HashMap<>();
+                user.put(Constants.KEY_FIRST_NAME,inputFirstName.getText().toString());
+                user.put(Constants.KEY_LAST_NAME,inputLastName.getText().toString());
+                user.put(Constants.KEY_EMAIL,inputEmail.getText().toString());
+                user.put(Constants.KEY_MOBILE,inputMobileNumber.getText().toString());
 
-        database.collection(Constants.KEY_COLLECTION_USERS)
-                .add(user)
-                .addOnSuccessListener(documentReference -> {
-                    preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-                    preferenceManager.putString(Constants.KEY_USER_ID, documentReference.getId());
-                    preferenceManager.putString(Constants.KEY_FIRST_NAME, inputFirstName.getText().toString());
-                    preferenceManager.putString(Constants.KEY_LAST_NAME,inputLastName.getText().toString());
-                    preferenceManager.putString(Constants.KEY_EMAIL,inputEmail.getText().toString());
-                    preferenceManager.putString(Constants.KEY_MOBILE,inputMobileNumber.getText().toString());
-                    Intent intent = new Intent(getApplicationContext(), Dashboard.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity (intent);
-                })
-                .addOnFailureListener(e -> {
-                    progressSignUp.setVisibility(View.INVISIBLE);
-                    buttonSignUp.setVisibility(View.VISIBLE);
-                    Toast.makeText(Register.this, "Error" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                database.collection(Constants.KEY_COLLECTION_USERS)
+                        .add(user)
+                        .addOnSuccessListener(documentReference -> {
+                            preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                            preferenceManager.putString(Constants.KEY_USER_ID, documentReference.getId());
+                            preferenceManager.putString(Constants.KEY_FIRST_NAME, inputFirstName.getText().toString());
+                            preferenceManager.putString(Constants.KEY_LAST_NAME,inputLastName.getText().toString());
+                            preferenceManager.putString(Constants.KEY_EMAIL,inputEmail.getText().toString());
+                            preferenceManager.putString(Constants.KEY_MOBILE,inputMobileNumber.getText().toString());
+                            Intent intent = new Intent(getApplicationContext(), Dashboard.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity (intent);
+                        })
+                        .addOnFailureListener(e -> {
+                            progressSignUp.setVisibility(View.INVISIBLE);
+                            buttonSignUp.setVisibility(View.VISIBLE);
+                            Toast.makeText(Register.this, "Error" + e.getMessage(), Toast.LENGTH_SHORT).show();
 
-                });
+                        });
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Register.this, "Failed to create Account", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
+
+
 
 
 
