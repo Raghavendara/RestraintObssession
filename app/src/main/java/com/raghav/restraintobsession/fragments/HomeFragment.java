@@ -117,7 +117,6 @@ public class HomeFragment extends Fragment {
                         preferenceManager.getString(Constants.KEY_USER_ID)
                 );
         documentReference.update(Constants.KEY_FCM_TOKEN, token)
-                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Token Updated successfully", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Unable to send token", Toast.LENGTH_SHORT).show());
     }
 

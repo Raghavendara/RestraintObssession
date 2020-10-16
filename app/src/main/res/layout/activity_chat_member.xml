@@ -5,5 +5,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".visitor_view.ChatMember">
+    
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/_8sdp"
+        android:paddingEnd="@dimen/_8sdp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:text="Member Chat"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/_23ssp" />
+
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/usersRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"/>
+
+    <TextView
+        android:id="@+id/textErrorMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/_13ssp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/layoutHeader"/>
+
+    <ProgressBar
+        android:id="@+id/usersProgressBar"
+        android:layout_width="@dimen/_25sdp"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutHeader"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
