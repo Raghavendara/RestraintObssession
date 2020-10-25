@@ -28,12 +28,13 @@ import com.raghav.restraintobsession.login.Login;
 import com.raghav.restraintobsession.utilities.Constants;
 import com.raghav.restraintobsession.utilities.PreferenceManager;
 import com.raghav.restraintobsession.visitor_view.ChatMember;
+import com.raghav.restraintobsession.visitor_view.DiscussionForum;
 
 import java.util.HashMap;
 
 public class HomeFragment extends Fragment {
 
-    CardView cardViewmemberchat;
+    CardView cardViewmemberchat, getCardViewdiscussionforum;
     private PreferenceManager preferenceManager;
 
     public HomeFragment() {
@@ -47,6 +48,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         cardViewmemberchat = view.findViewById(R.id.CardViewmemberschat);
+        getCardViewdiscussionforum = view.findViewById(R.id.CardViewdiscussionforum);
 
         preferenceManager = new PreferenceManager(getContext());
 
@@ -74,11 +76,23 @@ public class HomeFragment extends Fragment {
                 memberchat();
             }
         });
+        getCardViewdiscussionforum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                discussionforum();
+            }
+        });
 
 
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    private void discussionforum() {
+
+        Intent intent = new Intent(getActivity(), DiscussionForum.class);
+        startActivity(intent);
     }
 
     private void memberchat() {

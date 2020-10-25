@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.raghav.restraintobsession">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,10 +14,15 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-
-        <activity android:name=".visitor_view.ChatMember"/>
-        <activity android:name=".visitor_view.Dashboard">
-        </activity>
+        <activity android:name=".visitor_view.DiscussionForum" />
+        <activity
+            android:name=".visitor_view.OutgoingInvitationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".visitor_view.IncomingInvitationActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".visitor_view.ChatMember" />
+        <activity android:name=".visitor_view.Dashboard" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +32,15 @@
         </activity>
         <activity android:name=".login.Login" />
         <activity android:name=".register.Register" />
+        <activity android:name=".visitor_view.DummyActivity" />
+        <activity android:name=".visitor_view.PostDetailActivity" />
+
+
         <service
             android:name=".firebase.MessagingService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
